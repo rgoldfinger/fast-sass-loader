@@ -123,7 +123,15 @@ function* mergeSources(opts, entry, resolve, dependencies, level) {
           resolvedImport = yield resolve(entryDir, reqFile)
           break;
         } catch (err) {
-          // skip
+          if (opts.includePaths) {
+            for (let j = 0; j < opts.includePaths.length; j++) {
+              try {
+                resolvedImport = yield resolve(opts.includePaths[j], reqFile)
+              } catch (err) {
+                // skip
+              }
+            }
+          }
         }
       }
 
