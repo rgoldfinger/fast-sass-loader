@@ -117,13 +117,20 @@ function* mergeSources(opts, entry, resolve, dependencies, level) {
       let resolvedImport
 
       for (let i = 0; i < imports.length; i++) {
+        let reqFile = loaderUtils.urlToRequest(imports[i], opts.root)
         try {
-          let reqFile = loaderUtils.urlToRequest(imports[i], opts.root)
-
           resolvedImport = yield resolve(entryDir, reqFile)
           break;
         } catch (err) {
-          // skip
+          if (opts.includePaths) {
+            for (let j = 0; j < opts.includePaths.length; j++) {
+              try {
+                resolvedImport = yield resolve(opts.includePaths[j], reqFile)
+              } catch (err) {
+                // skip
+              }
+            }
+          }
         }
       }
 
